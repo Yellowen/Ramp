@@ -91,8 +91,13 @@ module Ramp
     end
 
     def call_remote(func, kwargs)
-      ask = rand(999999) until not @@ask_seqs.include? ask
-      @@ask_seqs << ask
+      while 1 do
+        ask = rand(999999)
+        if not @@ask_seqs.include? ask
+          @@ask_seqs << ask
+          break
+        end
+      end
 
       kwargs = Hash[kwargs.map{|k, v|[k.to_sym, v]}]
       if kwargs.include? :_ask or kwargs.include? :_command
@@ -105,8 +110,10 @@ module Ramp
       }
 
       command_struct.merge!(kwargs)
-
-      @socket.puts(AmpPacket.new(command_struct).to_s)
+      packet = AmpPacket.new(command_struct)
+      puts kwargs, command_struct, ask
+      #print ">>> ", packet.to_a, packet.to_s, "\n"
+      @socket.puts(packet.to_s)
     end
     
   end
