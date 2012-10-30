@@ -67,20 +67,21 @@ module Ramp
         
         
         value.to_s.bytes.to_a.each {|x| @buffer << x}
-        puts "KEY:\t #{key}|#{key.to_s.bytes.to_a.length}, \tVALUE: \t#{value}\t"
       end
 
       [0x00, 0x00].each {|x| @buffer << x}
-      puts ">> #{@buffer}"
     end
 
 
     def self.loads(data)
+      # Construct a hash from given data and return it
       buffer = data.to_s.bytes.to_a
       pos = 0
+      result = {}
 
-      puts "DATA: #{buffer}"
       while 1 do
+
+        # Parse the next key length
         key_length = 0
         buffer[pos..pos + 1].each {|x| key_length += x}
 
@@ -89,24 +90,28 @@ module Ramp
         end
 
         if key_length == 0
+          # key length of 0 means end of package.
           break
         end
-        puts "KL: #{key_length}"
-        pos += 2
-        key = buffer[pos..pos + key_length - 1].pack("c*")
-        puts "KEY: #{key}"
 
+        pos += 2
+        # Read the key 
+        key = buffer[pos..pos + key_length - 1].pack("c*")
+        
+        # Parse next value length
         pos += key_length
         value_length = 0
         buffer[pos..pos + 1].each {|x| value_length += x}
 
+        # Read the value
         pos += 2
-        puts "VL: #{value_length}"
         value = buffer[pos..pos + value_length - 1].pack("c*")
         pos += value_length
-        puts "VALUE: #{value}"
+        result[key.to_sym] = value
+
       end
       
+      result
     end
 
   end
@@ -148,9 +153,8 @@ module Ramp
 
       command_struct.merge!(kwargs)
       packet = AmpPacket.new(command_struct)
-      puts "CS: #{command_struct}, <#{command_struct.class}>"
-      #print ">>> ", packet.to_a, packet.to_s, "\n"
       @socket.syswrite(packet.to_s)
+
     end
     
   end
@@ -165,7 +169,8 @@ module Ramp
       loop do
         c = @socket.accept
         data = c.recv(1024)
-        AmpPacket::loads(data)
+        result = AmpPacket::loads(data)
+        puts "RESULT: #{result}"
         c.close()
       end
     end
