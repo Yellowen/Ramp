@@ -24,7 +24,7 @@ require "ramp/version"
 
 module Ramp
   # Ramp module
-  
+
   class AmpPacket
     # This class is responsble for packing and unpacking the AMP protocol pack
 
@@ -58,20 +58,57 @@ module Ramp
           raise AmpAskPacket::KeyLenError, "AMP keys should have 255 byte max kength"
         end
         
-        [0, key.length].each {|x| @buffer << x}
+        [0, key.to_s.bytes.to_a.length].each {|x| @buffer << x}
         key.to_s.bytes.to_a.each {|x| @buffer << x}
 
-        value_lenght = self.split_bytes "%04x" % value.to_s.length.to_s(16)
+        value_lenght = self.split_bytes "%04x" % value.to_s.bytes.to_a.length.to_s(16)
         @buffer << value_lenght[0].to_i
         @buffer << value_lenght[1].to_i
         
-        value.to_s.bytes.to_a.each {|x| @buffer << x}
         
+        value.to_s.bytes.to_a.each {|x| @buffer << x}
+        puts "KEY:\t #{key}|#{key.to_s.bytes.to_a.length}, \tVALUE: \t#{value}\t"
       end
 
       [0x00, 0x00].each {|x| @buffer << x}
-
+      puts ">> #{@buffer}"
     end
+
+
+    def self.loads(data)
+      buffer = data.to_s.bytes.to_a
+      pos = 0
+
+      puts "DATA: #{buffer}"
+      while 1 do
+        key_length = 0
+        buffer[pos..pos + 1].each {|x| key_length += x}
+
+        if key_length > 255
+          raise TypeError, "malform packet."
+        end
+
+        if key_length == 0
+          break
+        end
+        puts "KL: #{key_length}"
+        pos += 2
+        key = buffer[pos..pos + key_length - 1].pack("c*")
+        puts "KEY: #{key}"
+
+        pos += key_length
+        value_length = 0
+        buffer[pos..pos + 1].each {|x| value_length += x}
+
+        pos += 2
+        puts "VL: #{value_length}"
+        value = buffer[pos..pos + value_length - 1].pack("c*")
+        pos += value_length
+        puts "VALUE: #{value}"
+      end
+      
+    end
+
   end
 
 
@@ -111,11 +148,26 @@ module Ramp
 
       command_struct.merge!(kwargs)
       packet = AmpPacket.new(command_struct)
-      puts kwargs, command_struct, ask
+      puts "CS: #{command_struct}, <#{command_struct.class}>"
       #print ">>> ", packet.to_a, packet.to_s, "\n"
-      @socket.puts(packet.to_s)
+      @socket.syswrite(packet.to_s)
     end
     
   end
+  
 
+  class AmpServer
+    def initialize (host, port, secure=false, ssl_key=nil, ssl_cert=nil)
+        @socket = TCPServer.new port
+    end
+    
+    def listen
+      loop do
+        c = @socket.accept
+        data = c.recv(1024)
+        AmpPacket::loads(data)
+        c.close()
+      end
+    end
+  end
 end
