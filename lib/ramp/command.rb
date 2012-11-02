@@ -20,8 +20,14 @@
 module Ramp
 
   class Command
-    
-    attr_accessor :name
+
+    def name= (value)
+      @name = value
+    end
+
+    def name
+      @name
+    end
 
     def self.arguments args
       @arguments = args
