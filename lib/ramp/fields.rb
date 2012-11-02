@@ -19,29 +19,20 @@
 
 module Ramp
 
-  class Command
+  class StringArg << String
+
+    def to_o
+      super.to_s
+    end
+
+  end
+
+  class IntArg << Fixnum
     
-    attr_accessor :name
-
-    def self.arguments args
-      @arguments = args
+    def to_o
+      self.to_i
     end
 
-    def self.responses args
-      @responses = args
-    end
-
-    def self.errors args
-      @errors = args
-    end
-
-    def to_s
-
-      @arguments.each do |args|
-        
-      end
-
-    end
   end
 
 end
