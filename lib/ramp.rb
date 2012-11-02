@@ -20,11 +20,13 @@ require 'socket'
 require 'stringio'
 
 require "ramp/version"
+require "ramp/command.rb"
 
 
 module Ramp
   # Ramp module
 
+  
   class AmpPacket
     # This class is responsble for packing and unpacking the AMP protocol pack
 
@@ -154,7 +156,17 @@ module Ramp
       command_struct.merge!(kwargs)
       packet = AmpPacket.new(command_struct)
       @socket.syswrite(packet.to_s)
-
+      
+      data = @socket.recv(1024)
+      result = AmpPacket::loads(data)
+      
+      if result.include? :_answer
+        result.delete :_answer
+        result
+      elsif result.include? :_error
+        exception = Object.const_set(result[:_error_code], Class.new(StandardError))
+        raise exception, result[:_error_descriptio]
+      end
     end
     
   end
