@@ -34,6 +34,7 @@ module Ramp
 
         @value[keu.to_sym] = @argument[key.to_sym].new value
       end
+
     end
 
     def self.arguments args
@@ -71,6 +72,8 @@ module Ramp
 
     class KeyLenError < StandardError
     end
+
+        
 
   end
 end
