@@ -21,15 +21,55 @@ module Ramp
 
   class Command
     
-    def self.arguments *args
+    def initialize (args)
+      # Initialize an object with provided values for fields defined in
+      # @arguments using argument class method
+      @values = Hash.new
+      @buffer = []
+      args.each do |key, value|
+
+        if not @arguments.include? key
+          raise ArgumentError, "'#{key}' is not defined in '#{self.class}'."
+        end
+
+        @value[keu.to_sym] = @argument[key.to_sym].new value
+      end
+    end
+
+    def self.arguments args
       @arguments = args
     end
 
-    def self.responses *args
+    def self.responses args
       @responses = args
     end
 
-    def self.string
+    def to_s
+      @buffer.pack("c*")      
+    end
+
+    def generate_packet()
+      @values.each do |key, value|
+
+        if key.length > 255
+          raise KeyLenError, "AMP keys should have 255 byte max kength"
+        end
+        
+        [0, key.to_s.bytes.to_a.length].each {|x| @buffer << x}
+        key.to_s.bytes.to_a.each {|x| @buffer << x}
+
+        value_lenght = self.split_bytes "%04x" % value.to_s.bytes.to_a.length.to_s(16)
+        @buffer << value_lenght[0].to_i
+        @buffer << value_lenght[1].to_i
+        
+        
+        value.to_s.bytes.to_a.each {|x| @buffer << x}
+      end
+
+      [0x00, 0x00].each {|x| @buffer << x}
+    end
+
+    class KeyLenError < StandardError
     end
 
   end

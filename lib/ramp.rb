@@ -53,26 +53,6 @@ module Ramp
       hex.each_char.each_slice(2).map {|x| x.join}
     end
 
-    def generate_packet()
-      @_kwargs.each do |key, value|
-
-        if key.length > 255
-          raise AmpAskPacket::KeyLenError, "AMP keys should have 255 byte max kength"
-        end
-        
-        [0, key.to_s.bytes.to_a.length].each {|x| @buffer << x}
-        key.to_s.bytes.to_a.each {|x| @buffer << x}
-
-        value_lenght = self.split_bytes "%04x" % value.to_s.bytes.to_a.length.to_s(16)
-        @buffer << value_lenght[0].to_i
-        @buffer << value_lenght[1].to_i
-        
-        
-        value.to_s.bytes.to_a.each {|x| @buffer << x}
-      end
-
-      [0x00, 0x00].each {|x| @buffer << x}
-    end
 
 
     def self.loads(data)
