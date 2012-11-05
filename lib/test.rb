@@ -2,10 +2,14 @@
 $LOAD_PATH.unshift(".")
 require_relative 'ramp'
 
-## $LOAD_PATH.unshift(".")
-#s = Ramp::AMPClient.new 'localhost', 2222
-#s.call_remote("sameer")
+class Event < Ramp::Command
+  arguments sender: Ramp::Fields::StringArg, name: Ramp::Fields::StringArg
+  
+end
+
+a = Event.new sender: "me", name: "someevent"
+puts a.values, a.to_s
+
 s = Ramp::AmpClient.new 'localhost', 3333
-s.call_remote("event", :asask => 23,
-              :asdas_command => "sum",
-              :a => 23)
+s.call_remote(a)
+

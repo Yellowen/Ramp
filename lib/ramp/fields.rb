@@ -18,21 +18,21 @@
 # -----------------------------------------------------------------------------
 
 module Ramp
+  module Fields
+    class StringArg < String
 
-  class StringArg << String
+      def to_o
+        super.to_s
+      end
 
-    def to_o
-      super.to_s
     end
 
-  end
-
-  class IntArg << Fixnum
+    class IntArg < Fixnum
     
-    def to_o
-      self.to_i
+      def to_o
+        self.to_i
+      end
+
     end
-
   end
-
 end
