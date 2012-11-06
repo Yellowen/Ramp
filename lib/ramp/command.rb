@@ -88,6 +88,8 @@ module Ramp
       # @arguments using argument class method
       @values = {}
       @buffer = []
+      
+      @_args = args
 
       kwargs = Hash[args.map{|k, v|[k.to_sym, v]}]
       if kwargs.include? :_ask or kwargs.include? :_command
@@ -105,16 +107,12 @@ module Ramp
         # Construct the values ivar
         @values[key.to_sym] = self.class.arguments_hash[key.to_sym].new value
       end
-      @values[:_command] = "#{self.class}".downcase
-      
-    end
 
-
-    def to_s
       # Build a AMP packet data from kwargs hash for more information about
       # amp protocol structure take a look at:
       # http://www.amp-protocol.net
-
+ 
+      @values[:_command] = "#{self.class}".downcase
       while 1 do
         # TODO: is it safe in logic ?
         ask = rand(999999)
@@ -127,7 +125,12 @@ module Ramp
       @values[:_ask] = ask
       # Generate the packet data and store it into @buffer
       generate_packet
-      
+       
+    end
+
+
+    def to_s
+     
       @buffer.pack("c*")      
     end
 
@@ -135,6 +138,15 @@ module Ramp
       @buffer
     end
 
+    def ask
+      @values[:_ask]
+    end
+
+    def dup
+      self.class.new @_args
+    end
+
+    # Exceptions ------------------------------------------------
     class KeyLenError < StandardError
     end
 

@@ -17,7 +17,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # -----------------------------------------------------------------------------
 require 'socket'
-require 'stringio'
 
 require "ramp/version"
 require "ramp/command.rb"
@@ -30,6 +29,8 @@ module Ramp
   class AmpClient
     # AmpClient class is responsble for establishing a connection to a AMPserver
 
+    @@sent_packets = Hash.new
+
     def initialize (host, port, secure=false, ssl_key=nil, ssl_cert=nil)
       begin
         @socket = TCPSocket.new host, port
@@ -41,9 +42,16 @@ module Ramp
 
     def call_remote(command, kwargs)
 
+      # Create a new command instance
       obj = command.new kwargs
+
+      # Add the curretn command instance to the sent hash
+      @@sent_packets[obj.ask] = obj
+
+      # send the encoded data across the net
       @socket.syswrite(obj.to_s)
       
+
       data = @socket.recv(1024)
       result = command::loads(data)
       
