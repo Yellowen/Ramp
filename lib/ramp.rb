@@ -31,7 +31,9 @@ module Ramp
 
     @@sent_packets = Hash.new
 
-    def initialize (host, port, secure=false, ssl_key=nil, ssl_cert=nil)
+    def initialize (host, port, secure=false, ssl_key=nil, ssl_cert=nil,
+                    async=false)
+      @async = async
       begin
         @socket = TCPSocket.new host, port
       rescue Errno::ECONNREFUSED
@@ -48,22 +50,41 @@ module Ramp
       # Add the curretn command instance to the sent hash
       @@sent_packets[obj.ask] = obj
 
+      if @async
+        t = Thread.new {
+          transfer obj.to_s
+        }
+        
+        t.abort_on_exception = true
+        t.run
+      else
+        transfer obj.to_s
+      end
+         
+    end
+    
+    private
+    
+    def transfer data
       # send the encoded data across the net
-      @socket.syswrite(obj.to_s)
+      @socket.syswrite(data)
       
-
-      data = @socket.recv(1024)
-      result = command::loads(data)
+      # TODO: Should i specify a recieving limitation ?
+      rawdata = @socket.recv(1024)
       
-      if result.include? :_answer
-        result.delete :_answer
-        result
-      elsif result.include? :_error
+      data = Command::loads(rawdata)
+      
+      if data.include? :_answer
+        if @@sent_packets.keys.include? data
+          @@sent_packets[data[:_answer]].callback(data)
+        end
+      elsif data.include? :_error
         exception = Object.const_set(result[:_error_code], Class.new(StandardError))
         raise exception, result[:_error_descriptio]
       end
+            
     end
-    
+
   end
   
 

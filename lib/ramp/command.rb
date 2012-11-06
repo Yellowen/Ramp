@@ -146,6 +146,12 @@ module Ramp
       self.class.new @_args
     end
 
+    def callback (*)
+      # Each subclass may override this method to have a callback
+      # when any answer recieved.
+      nil
+    end
+
     # Exceptions ------------------------------------------------
     class KeyLenError < StandardError
     end
