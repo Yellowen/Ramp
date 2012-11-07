@@ -31,15 +31,21 @@ module Ramp
 
     @@sent_packets = Hash.new
 
-    def initialize (host, port, secure=false, ssl_key=nil, ssl_cert=nil,
-                    async=false)
-      @async = async
-      begin
-        @socket = TCPSocket.new host, port
-      rescue Errno::ECONNREFUSED
-        abort("Connection Refused")
-      end
+    def initialize (host, port, kwargs={secure: false,
+                      ssl_key: nil,
+                      ssl_cert:nil,
+                      async: false})
 
+      @async = kwargs[:async]
+      @secure = kwargs[:secure]
+      @ssl_key = kwargs[:ssl_key]
+      @ssl_cert = kwargs[:ssl_cert]
+
+      @host = host
+      @port = port
+
+      make_connection
+      
     end
 
     def call_remote(command, kwargs)
@@ -54,21 +60,30 @@ module Ramp
         t = Thread.new {
           transfer obj.to_s
         }
-        
         t.abort_on_exception = true
         t.run
       else
         transfer obj.to_s
       end
-         
+      puts "transfer done"
+
     end
-    
+
+    # Private members -----------------------------------
     private
     
+    def make_connection 
+      begin
+        @socket = TCPSocket.new @host, @port
+      rescue Errno::ECONNREFUSED
+        abort("Connection Refused")
+      end
+    end
+
     def transfer data
       # send the encoded data across the net
       @socket.syswrite(data)
-      
+
       # TODO: Should i specify a recieving limitation ?
       rawdata = @socket.recv(1024)
       
@@ -97,8 +112,11 @@ module Ramp
       loop do
         c = @socket.accept
         data = c.recv(1024)
-        result = AmpPacket::loads(data)
+        result = Command::loads(data)
         puts "RESULT: #{result}"
+        sleep(10)
+        puts "wake up"
+        #c.syswrite(data)
         c.close()
       end
     end
