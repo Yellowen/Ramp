@@ -73,11 +73,28 @@ module Ramp
     private
     
     def make_connection 
+
       begin
-        @socket = TCPSocket.new @host, @port
+        socket = TCPSocket.new @host, @port
       rescue Errno::ECONNREFUSED
-        abort("Connection Refused")
+        abort("Connection Refused")        
       end
+
+      if @secure
+        ctx = OpenSSL::SSL::SSLContext.new()
+        ctx.cert = OpenSSL::X509::Certificate.new(File.open(@ssl_cert))
+        ctx.key = OpenSSL::PKey::RSA.new(File.open(@ssl_key))
+        ctx.ssl_version = :SSLv23
+        ssl_socket = OpenSSL::SSL::SSLSocket.new(socket, ctx)
+        ssl_socket.sync_close = true
+        ssl_socket.connect
+        @socket = ssl_socket
+        return 
+
+      end
+
+      @socket = socket
+
     end
 
     def transfer data
