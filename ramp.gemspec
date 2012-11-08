@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 require File.expand_path('../lib/ramp/version', __FILE__)
+require 'rake'
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Sameer Rahmani"]
@@ -8,10 +9,11 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{AMP protocol implementation in Ruby}
   gem.homepage      = "http://ramp.yellowen.com/"
 
-  gem.files         = `git ls-files`.split($\)
+  gem.files         = FileList['lib/**/*.rb', '.gitignore', 'README.md', 'ramp.gemspec', 'LICENSE', 'Gemfile', 'Rakefile'].to_a
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "ramp"
   gem.require_paths = ["lib"]
   gem.version       = Ramp::VERSION
+
 end
