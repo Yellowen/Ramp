@@ -19,20 +19,34 @@
 
 module Ramp
   module Fields
-    class StringArg < String
 
-      def to_o
-        super.to_s
+    class StringField < String
+
+      def self.to_o data
+        String.new data
       end
 
     end
 
-    class IntArg < Fixnum
+    class IntegerField < Integer
     
-      def to_o
-        self.to_i
+      def self.to_o data
+        Integer.new data
       end
 
     end
+
+    class JsonField < Hash
+      
+      def to_s
+        JSON.dump(self)
+      end
+
+      def self.to_o data
+        JSON.load(data)
+      end
+
+    end
+
   end
 end
