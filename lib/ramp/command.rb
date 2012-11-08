@@ -116,7 +116,6 @@ module Ramp
       # amp protocol structure take a look at:
       # http://www.amp-protocol.net
  
-      puts ">>>> ", self.class.command_name
       @values[:_command] = self.class.command_name
 
       while 1 do

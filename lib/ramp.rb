@@ -65,7 +65,6 @@ module Ramp
       else
         transfer obj.to_s
       end
-      puts "transfer done"
 
     end
 
@@ -100,42 +99,22 @@ module Ramp
     def transfer data
       # send the encoded data across the net
       @socket.syswrite(data)
-      puts "Sent >>> #{data}"
       # TODO: Should i specify a recieving limitation ?
       rawdata = @socket.recv(1024)
-      puts "Recv >>> #{rawdata}"
       data = Command::loads(rawdata)
-      puts "Load >>> #{data}"
+
       if data.include? :_answer
         if @@sent_packets.keys.include? data
           @@sent_packets[data[:_answer]].callback(data)
         end
       elsif data.include? :_error
-        exception = Object.const_set(result[:_error_code], Class.new(StandardError))
-        raise exception, result[:_error_descriptio]
+        # Generate an exception from _error_code and rise it
+        exception = Object.const_set(data[:_error_code], Class.new(StandardError))
+        raise exception, data[:_error_description]
       end
             
     end
 
   end
-  
 
-  class AmpServer
-    def initialize (host, port, secure=false, ssl_key=nil, ssl_cert=nil)
-        @socket = TCPServer.new port
-    end
-    
-    def listen
-      loop do
-        c = @socket.accept
-        data = c.recv(1024)
-        result = Command::loads(data)
-        puts "RESULT: #{result}"
-        sleep(10)
-        puts "wake up"
-        #c.syswrite(data)
-        c.close()
-      end
-    end
-  end
 end
