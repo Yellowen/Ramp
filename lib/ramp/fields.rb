@@ -38,6 +38,8 @@ module Ramp
 
     class JsonField < Hash
       
+      require 'json'
+
       def to_s
         JSON.dump(self)
       end

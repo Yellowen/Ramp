@@ -100,12 +100,12 @@ module Ramp
     def transfer data
       # send the encoded data across the net
       @socket.syswrite(data)
-
+      puts "Sent >>> #{data}"
       # TODO: Should i specify a recieving limitation ?
       rawdata = @socket.recv(1024)
-      
+      puts "Recv >>> #{rawdata}"
       data = Command::loads(rawdata)
-      
+      puts "Load >>> #{data}"
       if data.include? :_answer
         if @@sent_packets.keys.include? data
           @@sent_packets[data[:_answer]].callback(data)

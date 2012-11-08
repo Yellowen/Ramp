@@ -24,7 +24,7 @@ module Ramp
     # EignClass -------------------------------------
     class << self
       
-      attr_accessor :arguments_hash, :responses_hash
+      attr_accessor :arguments_hash, :responses_hash, :command_name
 
       def arguments args
         @arguments_hash = args
@@ -32,6 +32,10 @@ module Ramp
 
       def responses args
         @responses_hash = args
+      end
+
+      def command name
+        @command_name = name
       end
 
       def loads(data)
@@ -112,7 +116,9 @@ module Ramp
       # amp protocol structure take a look at:
       # http://www.amp-protocol.net
  
-      @values[:_command] = "#{self.class}".downcase
+      puts ">>>> ", self.class.command_name
+      @values[:_command] = self.class.command_name
+
       while 1 do
         # TODO: is it safe in logic ?
         ask = rand(999999)
