@@ -78,12 +78,16 @@ require "ramp/version"
 require "ramp/command.rb"
 require "ramp/fields.rb"
 
-# This module asdasd
+# This module contains all the AMP protocol related classes
 module Ramp
-  # Ramp module
 
+  # AmpClient class is responsble for establishing a connection to a AMP server
+  # host:: address of remote amp server
+  # port:: port to connect to.
+  # kwarrgs:: is a hash that contains extra optional arguments.
+  # * secure:: Use an SSL secured connection
+  # * ssl_key:: Path to SSL key.
   class AmpClient
-    # AmpClient class is responsble for establishing a connection to a AMPserver
 
     @@sent_packets = Hash.new
 
