@@ -1,7 +1,7 @@
-# Ramp
+Ramp
+=
 
-TODO: Write a gem description
-
+Ramp is AMP protocol implementation in Ruby language. AMP is a very simple message passing and RPC protocol. for more information take a look at {here}[http://amp-protocol.net].
 ## Installation
 
 Add this line to your application's Gemfile:

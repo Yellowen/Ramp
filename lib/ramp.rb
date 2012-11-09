@@ -1,6 +1,61 @@
-# -----------------------------------------------------------------------------
+#:title: Ramp Documentation
+#= Ramp
+#Ramp is AMP protocol implementation in Ruby language. AMP is a very
+#simple message passing and RPC protocol. for more information take a
+#look at {here}[http://amp-protocol.net].
+#
+#== Installation
+#As you may know already installing ruby gems it quite easy:
+# $ gem install ramp
+#Isn't it easy ?
+#
+#== Usage
+#As every thing else about Ramp, its usage is easy too :P
+#At first you should be familiar with {AMP protocol}[http://amp-protocol.net]
+#a little, AMP protocol usa <b>Commands</b> as its RPC units and you should
+#define your own <b>Command</b> subclass. Let see an example:
+#
+# require 'ramp'
+#
+# class Event < Ramp::Command
+#
+#   command "Events"
+#
+#   arguments (
+#              {name: Ramp::Fields::StringField,
+#               sender: Ramp::Fields::StringField,
+#               kwargs: Ramp::Fields::JsonField}
+#              )
+#
+#   responses (
+#              {status: Ramp::Fields::IntegerField}
+#              )
+#
+# end
+#
+#Ok, let's talk a bit more about the example class. As your can see the 
+#<i>Event</i> class is a subclass of <b>Ramp::Command</b> class. and we 
+#specify a command for our class by using <b>command</b> class method.
+#Also you should specify the command arguments and responses like above.
+#
+#That is all we need, now we can run the remote command easily like:
+#
+# requre 'ramp'
+# 
+# rempte = Ramp::AmpClient.new 'localhost', 8888, :async => false
+# remote.call_remote(Event, sender: "me", name: "something", kwargs: {:foo => "bar"})
+#
+#That's all. for more information about take a look at _Ramp::AMPClient class.
+#
+#Note:: Remember that Commands should have the same signature as they have on remote server.
+#
+#== Credit
+#Author::    Dave Thomas  (mailto:lxsameer@gnu.org)
+#Copyright:: Copyright (c) 2012 Yellowen Inc
+#License::   Distributes under the term of GPLv3
+
+#--
 #    RAMP - AMP protocol client implementation in Ruby
-#    Copyright (C) 2012 Yellowen
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,14 +70,15 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-# -----------------------------------------------------------------------------
+#++
+
 require 'socket'
 
 require "ramp/version"
 require "ramp/command.rb"
 require "ramp/fields.rb"
 
-
+# This module asdasd
 module Ramp
   # Ramp module
 
