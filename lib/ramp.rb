@@ -82,15 +82,18 @@ require "ramp/fields.rb"
 module Ramp
 
   # AmpClient class is responsble for establishing a connection to a AMP server
-  # host:: address of remote amp server
-  # port:: port to connect to.
-  # kwarrgs:: is a hash that contains extra optional arguments.
-  # * secure:: Use an SSL secured connection
-  # * ssl_key:: Path to SSL key.
   class AmpClient
 
     @@sent_packets = Hash.new
 
+    # host:: address of remote amp server
+    # port:: port to connect to.
+    # kwarrgs:: is a hash that contains extra optional arguments.
+    # * secure:: Use an SSL secured connection
+    # * ssl_key:: Path to SSL key.
+    # * ssl_cert:: Path to client SSL cert file.
+    # * async:: If this argument was true then Ramp use a threaded solution to
+    #           send the request and handle the response
     def initialize (host, port, kwargs={secure: false,
                       ssl_key: nil,
                       ssl_cert:nil,
@@ -108,7 +111,11 @@ module Ramp
       
     end
 
-    def call_remote(command, kwargs)
+    # This method will call the given command on the remote server with given
+    # arguments in kwargs
+    # command:: is a subclass of *Command* class.
+    # kwargs:: the arguments for the *command*'s initilize method.
+    def call(command, kwargs)
 
       # Create a new command instance
       obj = command.new kwargs

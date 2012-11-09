@@ -20,8 +20,11 @@
 # ++
 
 module Ramp
+
+  # This module contains several Data type class of amp protocol
   module Fields
 
+    # StringField is a simple String class
     class StringField < String
 
       def self.to_o data
@@ -30,6 +33,7 @@ module Ramp
 
     end
 
+    # IntegerField is a simple Integer subclass.
     class IntegerField < Integer
     
       def self.to_o data
@@ -38,6 +42,7 @@ module Ramp
 
     end
 
+    # JsonField is a hash like object and allow your to pass any hash via amp
     class JsonField < Hash
       
       require 'json'

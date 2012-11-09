@@ -21,6 +21,9 @@
 
 module Ramp
 
+  #Base class for an AMP protocol command. Any user command should subclassed
+  #from this class and define a command name, arguments, reponses and any
+  #exceptions or callback method if needed.
   class Command
 
     # EignClass -------------------------------------
@@ -28,20 +31,33 @@ module Ramp
       
       attr_accessor :arguments_hash, :responses_hash, :command_name
 
-      def arguments args
-        @arguments_hash = args
-      end
-
-      def responses args
-        @responses_hash = args
-      end
-
+      # Define the command name. Remote server will recognize this command this 
+      # this name.
+      # name:: Command name
       def command name
         @command_name = name
       end
 
+      # Defines all the arguments of the command. arguments should define
+      # in a hash and each one value should be a class that have both 
+      # *to_s* instance method and *to_o* class method.
+      # args:: is the hash that contains the arguments defination
+      def arguments args
+        @arguments_hash = args
+      end
+
+      # Defines all the possible responses of the command. Responses should
+      # define in a hash and each one value should be a class that have both 
+      # *to_s* instance method and *to_o* class method.
+      # args:: is the hash that contains the reponses defination      
+      def responses args
+        @responses_hash = args
+      end
+
+      # Construct a hash from given data and return it. data should be a packed
+      # amp packet.
       def loads(data)
-        # Construct a hash from given data and return it
+
         buffer = data.to_s.bytes.to_a
         pos = 0
         result = {}
@@ -88,7 +104,9 @@ module Ramp
     @@ask_seqs = []
 
     attr_reader :values
-
+    
+    # Inizilize a new command using the *args* parameter, The *args* parameter
+    # should conatain the exact keys as the hash that specify in *arguments*
     def initialize (args)
       # Initialize an object with provided values for fields defined in
       # @arguments using argument class method
@@ -145,21 +163,24 @@ module Ramp
       @buffer
     end
 
+    # Return the current command *_ask* value
     def ask
       @values[:_ask]
     end
 
+    # Duplicat the current command with new *_ask* value
     def dup
       self.class.new @_args
     end
 
+    # Each subclass may override this method to have a callback
+    # when any answer recieved.
     def callback (*)
-      # Each subclass may override this method to have a callback
-      # when any answer recieved.
       nil
     end
 
     # Exceptions ------------------------------------------------
+
     class KeyLenError < StandardError
     end
 
