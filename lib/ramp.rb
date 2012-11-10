@@ -50,7 +50,7 @@
 #Note:: Remember that Commands should have the same signature as they have on remote server.
 #
 #== Credit
-#Author::    Dave Thomas  (mailto:lxsameer@gnu.org)
+#Author::    Sameer Rahmani  (mailto:lxsameer@gnu.org)
 #Copyright:: Copyright (c) 2012 Yellowen Inc
 #License::   Distributes under the term of GPLv3
 
